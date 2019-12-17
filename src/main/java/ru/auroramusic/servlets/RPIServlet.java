@@ -1,5 +1,8 @@
 package ru.auroramusic.servlets;
 
+import ru.auroramusic.config.ConfigManager;
+import ru.auroramusic.config.Configs;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,8 +16,7 @@ import java.util.stream.Collectors;
 
 
 public class RPIServlet extends HttpServlet {
-    private static String FILE_DIR = "";
-    File file = new File("D:\\test.txt");
+    File file = new File(ConfigManager.get("server.dht.filePath"));
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
