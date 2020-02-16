@@ -50,7 +50,7 @@ public class ScoreBoard {
                    .append(i).append("Region").append(separator)
                    .append(i).append("Club").append(separator)
                    .append(i).append("StartPosition").append(separator)
-                   .append(i).append("getStartOrder").append(separator)
+                   .append(i).append("StartOrder").append(separator)
                    .append(i).append("DtFinish").append(separator)
                    .append(i).append("TotalBehind").append(separator)
                    .append(i).append("RunTime").append(separator)
@@ -58,11 +58,11 @@ public class ScoreBoard {
        }
         for (ResultRecord resultRecord : resultRecords) {
             if (resultRecord != null && scoreBoardManager.getParticipant(resultRecord.getResult().getId()) != null) {
-                sb.append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName()).append(separator)
-                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName()).append(separator)
+                         sb.append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName()).append(separator)
+                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName()).append(separator)
                         .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getNoc()).append(separator)
                         .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getRegione()).append(separator)
-                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getClub()).append(separator)
+                        .append((scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getClub().replace(","," "))).append(separator)
                         .append(resultRecord.getResult().getStartPosition()).append(separator)
                         .append(resultRecord.getResult().getStartOrder()).append(separator)
                         .append(resultRecord.getResult().getDtFinish()).append(separator)

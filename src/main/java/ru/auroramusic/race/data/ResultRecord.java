@@ -17,10 +17,12 @@ public class ResultRecord implements Comparable{
         ResultRecord record2 = (ResultRecord) o;
         String raceId1 = this.result.getRaceId() == null ? "z" : this.result.getRaceId();
         String raceId2 = record2.result.getRaceId() == null ? "z" : record2.result.getRaceId();
-        String dtFinish = this.result.getDtFinish() == null ? "z" : this.result.getDtFinish();
+//        String dtFinish = this.result.getDtFinish() == null ? "z" : this.result.getDtFinish();
+        int startOrder = this.result.getStartOrder();
+        int startOrder2 = record2.result.getStartOrder();
         String dtFinish2 = record2.result.getDtFinish() == null ? "z" : record2.result.getDtFinish();
         return raceId1.equals(raceId2) ?
-                dtFinish.compareTo(dtFinish2)
+                Integer.compare(startOrder, startOrder2)
                 : raceId1.compareTo(raceId2);
     }
     //TODO Добавить проверки типов, написать тесты

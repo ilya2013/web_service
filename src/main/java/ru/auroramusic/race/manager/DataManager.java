@@ -4,6 +4,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import ru.auroramusic.config.Configs;
 import ru.auroramusic.race.Ski123Data;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.log4j.Logger;
 
 public class DataManager implements Runnable {
@@ -42,7 +44,7 @@ public class DataManager implements Runnable {
     public String inputStreamToString(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
         String line;
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         logger.info(Thread.currentThread().toString() + " File read starting...");
         while ((line = br.readLine()) != null) {
             sb.append(line);
