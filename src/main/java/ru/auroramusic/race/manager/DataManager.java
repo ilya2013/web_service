@@ -43,6 +43,7 @@ public class DataManager implements Runnable {
         StringBuilder sb = new StringBuilder();
         String line;
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        logger.info(Thread.currentThread().toString() + " File read starting...");
         while ((line = br.readLine()) != null) {
             sb.append(line);
         }
