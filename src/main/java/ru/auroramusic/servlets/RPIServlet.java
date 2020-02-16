@@ -1,8 +1,6 @@
 package ru.auroramusic.servlets;
 
 import ru.auroramusic.config.ConfigManager;
-import ru.auroramusic.config.Configs;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,19 +10,42 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 
 public class RPIServlet extends HttpServlet {
-    File file = new File(ConfigManager.get("server.dht.filePath"));
+    File mainFile = new File(ConfigManager.get("server.file.main"));
+    ConcurrentMap<String, File> files = new ConcurrentHashMap<>();
+
+    public RPIServlet() {
+        super();
+        parseFiles(ConfigManager.get("server.file.extra"));
+    }
+
+    private void parseFiles(String str) {
+        if (str != null && !str.isEmpty()) {
+            for (String keyValue : str.split(";")) {
+                    String[] aliasValue = keyValue.split("=");
+                    if (aliasValue.length == 2) {
+                    files.put(aliasValue[0], new File(aliasValue[1]));
+                }
+            }
+        }
+    }
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
-        String value = request.getParameter("row");
-        try (BufferedReader read = new BufferedReader(new FileReader(this.file))) {
-            if (value != null && value.toUpperCase().equals("ALL")) {
+        response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        String rowParam = request.getParameter("row");
+        String fileAlias = request.getParameter("file");
+        File file = fileAlias == null ? mainFile : files.get(fileAlias);
+        try (BufferedReader read = new BufferedReader(new FileReader(file))) {
+            if (rowParam != null && rowParam.toUpperCase().equals("ALL")) {
                 read.lines().forEach(response.getWriter()::println);
-            } else if ((value != null && value.toUpperCase().equals("FIRST"))) {
+            } else if ((rowParam != null && rowParam.toUpperCase().equals("FIRST"))) {
                 read.lines().findFirst().ifPresent(response.getWriter()::println);
             } else {
                 List<String> lines = read.lines().collect(Collectors.toList());
@@ -37,20 +58,20 @@ public class RPIServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             e.printStackTrace();
         }
-        //response.getWriter().println(line);
-        response.setContentType("text/html;charset=utf-8");
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) throws ServletException, IOException {
-        String dir = request.getParameter("dir");
+        String file = request.getParameter("file");
+        String alias = request.getParameter("alias");
         response.setContentType("text/html;charset=utf-8");
 
-        if (dir == null) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        if (alias == null || file == null) {
+            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else if (!new File(file).exists()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            file = new File(dir);
+            files.put(alias, new File(file));
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
