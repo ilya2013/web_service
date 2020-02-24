@@ -26,10 +26,16 @@ public class RaceResultsServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         logger.info(req.toString());
         String raceId = req.getParameter("raceId");
+        int rowLimit = 0;
+        try {
+            rowLimit = Integer.parseInt(req.getParameter("rowLimit"));
+        } catch (Exception e) {
+            logger.error(e);
+        }
         if (raceId == null || raceId.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {
-            resp.getWriter().print(scoreBoardManager.getScores(raceId));
+            resp.getWriter().print(rowLimit != 0 ? scoreBoardManager.getScores(raceId, rowLimit) : scoreBoardManager.getScores(raceId));
             resp.setStatus(HttpServletResponse.SC_OK);
             logger.info(scoreBoardManager.getScores(raceId));
             logger.info(resp.toString());

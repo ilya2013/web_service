@@ -25,7 +25,12 @@ public class ScoreBoardManager {
     }
     public String getScores(String raceId) {
         int rowLimit;
-        rowLimit = Integer.parseInt(configs.get("server.race.ski.scoreBoard.rowLimit"));
+        try {
+            rowLimit = Integer.parseInt(configs.get("server.race.ski.scoreBoard.rowLimit"));
+        } catch (Exception e) {
+            logger.error(e);
+            rowLimit = 5;
+        }
         return getScores(raceId, rowLimit);
     }
     public String getScores(String raceId, int rowLimit) {

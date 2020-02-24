@@ -57,12 +57,13 @@ public class ScoreBoard {
                    .append(i).append("TotalTime").append(i != rowLimit ? separator : System.lineSeparator());
        }
         for (ResultRecord resultRecord : resultRecords) {
-            if (resultRecord != null && scoreBoardManager.getParticipant(resultRecord.getResult().getId()) != null) {
-                         sb.append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName()).append(separator)
-                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName()).append(separator)
-                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getNoc()).append(separator)
-                        .append(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getRegione()).append(separator)
-                        .append((scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getClub().replace(","," "))).append(separator)
+            if (resultRecord != null && scoreBoardManager.getParticipant(resultRecord.getResult().getId()) != null
+                && resultRecord.getResult().isValidResult()) {
+                         sb.append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName())).append(separator)
+                        .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName())).append(separator)
+                        .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getNoc())).append(separator)
+                        .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getRegione())).append(separator)
+                        .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getClub())).append(separator)
                         .append(resultRecord.getResult().getStartPosition()).append(separator)
                         .append(resultRecord.getResult().getStartOrder()).append(separator)
                         .append(resultRecord.getResult().getDtFinish()).append(separator)
@@ -100,6 +101,11 @@ public class ScoreBoard {
 
     public String getRaceId() {
         return raceId;
+    }
+
+    private String resultClean(String str) {
+        str = str.replace(",", " ").replace(System.lineSeparator(), " ");
+        return str;
     }
 
     @Override
