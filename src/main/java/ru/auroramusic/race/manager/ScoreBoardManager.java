@@ -8,6 +8,8 @@ import ru.auroramusic.race.data.Result;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ScoreBoardManager {
     private final Map<Integer, Participant> participants = new ConcurrentHashMap<>();
@@ -16,12 +18,14 @@ public class ScoreBoardManager {
     private final DataManager dataManager;
     final static Logger logger = Logger.getLogger(ScoreBoardManager.class);
     private final Configs configs;
+    ExecutorService executor = Executors.newFixedThreadPool(2);
 
 
     public ScoreBoardManager(Configs configs) {
         this.dataManager = new DataManager(this, configs);
         this.configs = configs;
-        new Thread(dataManager).start();
+//        new Thread(dataManager).start();
+        executor.submit(dataManager);
     }
     public String getScores(String raceId) {
         int rowLimit;

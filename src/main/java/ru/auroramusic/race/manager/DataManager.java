@@ -3,6 +3,7 @@ package ru.auroramusic.race.manager;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import ru.auroramusic.config.Configs;
 import ru.auroramusic.race.Ski123Data;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -26,18 +27,25 @@ public class DataManager implements Runnable {
                 : new File(DEFAULT_RESULTS_FILE);
         XmlMapper xmlMapper = new XmlMapper();
         String xml = null;
-        try {
-            logger.info("File for read: " + file.getAbsolutePath());
-            while (true) {
+        while (true) {
+            try {
+                logger.info("File for read: " + file.getAbsolutePath());
                 xml = inputStreamToString(new FileInputStream(file));
                 logger.debug("File content: " + xml);
                 Ski123Data value = xmlMapper.readValue(xml, Ski123Data.class);
                 value.getResults().forEach(scoreBoardManager::addResult);
                 value.getParticipants().forEach(scoreBoardManager::addParticipant);
                 Thread.sleep(500L);
+            } catch (IOException | InterruptedException e) {
+                logger.error(e);
+                e.printStackTrace();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    logger.error(ex);
+                    ex.printStackTrace();
+                }
             }
-        } catch (IOException|InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -45,7 +53,7 @@ public class DataManager implements Runnable {
         StringBuilder sb = new StringBuilder();
         String line;
         BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        logger.info(Thread.currentThread().toString() + " File read starting...");
+        logger.info(" File read starting...");
         while ((line = br.readLine()) != null) {
             sb.append(line);
         }

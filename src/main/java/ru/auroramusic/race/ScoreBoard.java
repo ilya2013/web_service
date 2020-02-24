@@ -11,7 +11,7 @@ public class ScoreBoard {
     private final String name;
     private final String raceId;
     private final Set<ResultRecord> resultRecords = new TreeSet<>();
-    private final int DEFAULT_ROW_LIMIT = 5;
+    private final static int DEFAULT_ROW_LIMIT = 5;
     private final String separator = ",";
 
     public ScoreBoard(String name, String raceId, ScoreBoardManager scoreBoardManager) {
