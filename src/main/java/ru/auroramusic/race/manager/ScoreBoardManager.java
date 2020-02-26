@@ -35,12 +35,12 @@ public class ScoreBoardManager {
             logger.error(e);
             rowLimit = 5;
         }
-        return getScores(raceId, rowLimit);
+        return getScores(raceId, rowLimit, null);
     }
-    public String getScores(String raceId, int rowLimit) {
+    public String getScores(String raceId, int rowLimit, String type) {
         String rslt;
         scoreBoards.putIfAbsent(raceId, new ScoreBoard(raceId, raceId, this));
-        rslt = scoreBoards.get(raceId).getScores(rowLimit);
+        rslt = scoreBoards.get(raceId).getScores(rowLimit, type);
         return rslt;
     }
 

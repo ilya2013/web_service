@@ -5,6 +5,7 @@ import ru.auroramusic.race.data.ResultRecord;
 import ru.auroramusic.race.manager.ScoreBoardManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScoreBoard {
     private final  ScoreBoardManager scoreBoardManager;
@@ -13,6 +14,11 @@ public class ScoreBoard {
     private final Set<ResultRecord> resultRecords = new TreeSet<>();
     private final static int DEFAULT_ROW_LIMIT = 5;
     private final String separator = ",";
+    public static final String  START_ORDER = "START";
+    public static final String  FINISH_ORDER = "FINISH";
+    
+    private final Comparator<ResultRecord> startOrderComparator = Comparator.comparingInt(o -> o.getResult().getStartOrder());
+    private final Comparator<ResultRecord> rnkOrderComparator = Comparator.comparingInt(o -> o.getResult().getRnkOrder());
 
     public ScoreBoard(String name, String raceId, ScoreBoardManager scoreBoardManager) {
         this.name = name;
@@ -39,27 +45,51 @@ public class ScoreBoard {
                         + scoreBoardManager.getParticipant(resultRecord.getResult().getId())));
     }
 
+    public String getScores(int rowLimit, String type) {
+        int localRowLimit = rowLimit < 0 || rowLimit > 100 ? this.DEFAULT_ROW_LIMIT : rowLimit;
+        Comparator<ResultRecord> comparator = null;
+        if (type == null) {
+            comparator = null;
+        } else if (START_ORDER.equals(type.toUpperCase())) {
+            comparator = startOrderComparator;
+        } else if (FINISH_ORDER.equals(type.toUpperCase())){
+            comparator = rnkOrderComparator;
+        }
+        return toCSV(localRowLimit, comparator);
+    }
+
+
     public String getScores(int rowLimit) {
-       StringBuilder sb = new StringBuilder();
-       int rowNumber = 0;
-       int localRowLimit = rowLimit < 0 || rowLimit > 100 ? this.DEFAULT_ROW_LIMIT : rowLimit;
-       for(int i = 1; i <= localRowLimit; i++) {
-           sb.append(i).append("FamilyName").append(separator)
-                   .append(i).append("GivenName").append(separator)
-                   .append(i).append("NOC").append(separator)
-                   .append(i).append("Region").append(separator)
-                   .append(i).append("Club").append(separator)
-                   .append(i).append("StartPosition").append(separator)
-                   .append(i).append("StartOrder").append(separator)
-                   .append(i).append("DtFinish").append(separator)
-                   .append(i).append("TotalBehind").append(separator)
-                   .append(i).append("RunTime").append(separator)
-                   .append(i).append("TotalTime").append(i != rowLimit ? separator : System.lineSeparator());
-       }
-        for (ResultRecord resultRecord : resultRecords) {
+     return getScores(rowLimit, null);
+    }
+    
+    private String toCSV(int rowLimit, Comparator<ResultRecord> comparator) {
+        int rowNumber = 0;
+        StringBuilder sb = new StringBuilder();
+        List<ResultRecord> sortedResults;
+        if (comparator != null) {
+            sortedResults = resultRecords.stream().sorted(comparator).collect(Collectors.toList());
+        } else {
+            sortedResults = new ArrayList<>(resultRecords);
+        }
+        for(int i = 1; i <= rowLimit; i++) {
+            sb.append(i).append("FamilyName").append(separator)
+                    .append(i).append("GivenName").append(separator)
+                    .append(i).append("NOC").append(separator)
+                    .append(i).append("Region").append(separator)
+                    .append(i).append("Club").append(separator)
+                    .append(i).append("StartPosition").append(separator)
+                    .append(i).append("StartOrder").append(separator)
+                    .append(i).append("DtFinish").append(separator)
+                    .append(i).append("TotalBehind").append(separator)
+                    .append(i).append("RunTime").append(separator)
+                    .append(i).append("RnkOrder").append(separator)
+                    .append(i).append("TotalTime").append(i != rowLimit ? separator : System.lineSeparator());
+        }
+        for (ResultRecord resultRecord : sortedResults) {
             if (resultRecord != null && scoreBoardManager.getParticipant(resultRecord.getResult().getId()) != null
-                && resultRecord.getResult().isValidResult()) {
-                         sb.append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName())).append(separator)
+                    && resultRecord.getResult().isValidResult()) {
+                sb.append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName())).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName())).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getNoc())).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getRegione())).append(separator)
@@ -69,6 +99,7 @@ public class ScoreBoard {
                         .append(resultRecord.getResult().getDtFinish()).append(separator)
                         .append(resultRecord.getResult().getTotalBehind()).append(separator)
                         .append(msToTime(resultRecord.getResult().getRunTime())).append(separator)
+                        .append(resultRecord.getResult().getRnkOrder()).append(separator)
                         .append(msToTime(resultRecord.getResult().getTotalTime()));
                 rowNumber++;
                 if ((rowNumber % rowLimit) == 0 || rowNumber == resultRecords.size()) {

@@ -26,6 +26,7 @@ public class RaceResultsServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         logger.info(req.toString());
         String raceId = req.getParameter("raceId");
+        String type = req.getParameter("type");
         int rowLimit = 0;
         try {
             rowLimit = Integer.parseInt(req.getParameter("rowLimit"));
@@ -35,9 +36,8 @@ public class RaceResultsServlet extends HttpServlet {
         if (raceId == null || raceId.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {
-            resp.getWriter().print(rowLimit != 0 ? scoreBoardManager.getScores(raceId, rowLimit) : scoreBoardManager.getScores(raceId));
+            resp.getWriter().print(rowLimit != 0 ? scoreBoardManager.getScores(raceId, rowLimit, type) : scoreBoardManager.getScores(raceId));
             resp.setStatus(HttpServletResponse.SC_OK);
-            logger.info(scoreBoardManager.getScores(raceId));
             logger.info(resp.toString());
         }
     }
