@@ -75,6 +75,7 @@ public class ScoreBoard {
         for(int i = 1; i <= rowLimit; i++) {
             sb.append(i).append("FamilyName").append(separator)
                     .append(i).append("GivenName").append(separator)
+                    .append(i).append("FormatName").append(separator)
                     .append(i).append("NOC").append(separator)
                     .append(i).append("Region").append(separator)
                     .append(i).append("Club").append(separator)
@@ -89,8 +90,10 @@ public class ScoreBoard {
         for (ResultRecord resultRecord : sortedResults) {
             if (resultRecord != null && scoreBoardManager.getParticipant(resultRecord.getResult().getId()) != null
                     && resultRecord.getResult().isValidResult()) {
-                sb.append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName())).append(separator)
-                        .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName())).append(separator)
+                sb.append(nameFormat(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName()))).append(separator)
+                        .append(nameFormat(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName()))).append(separator)
+                        .append(resultClean(nameFormat(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getFamilyName()
+                                                        , scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getGivenName()))).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getNoc())).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getRegione())).append(separator)
                         .append(resultClean(scoreBoardManager.getParticipant(resultRecord.getResult().getId()).getClub())).append(separator)
@@ -137,6 +140,25 @@ public class ScoreBoard {
     private String resultClean(String str) {
         str = str.replace(",", " ").replace(System.lineSeparator(), " ");
         return str;
+    }
+
+    private String nameFormat(String str) {
+        String result = null;
+        if (str != null) {
+            result = str.substring(0,1).toUpperCase() + str.substring(1).toLowerCase();
+        }
+        return result;
+    }
+
+    private String nameFormat(String str, String str2) {
+        StringBuilder result = new StringBuilder();
+        if (str != null) {
+            result.append(nameFormat(str));
+        }
+        if (str2 != null) {
+            result.append(" ").append(str2.substring(0, 1).toUpperCase()).append(".");
+        }
+        return result.toString();
     }
 
     @Override
