@@ -5,6 +5,7 @@ import ru.auroramusic.config.Configs;
 import ru.auroramusic.race.ScoreBoard;
 import ru.auroramusic.race.data.Participant;
 import ru.auroramusic.race.data.Result;
+import ru.auroramusic.race.data.Schedule;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,7 @@ import java.util.concurrent.Executors;
 public class ScoreBoardManager {
     private final Map<Integer, Participant> participants = new ConcurrentHashMap<>();
     private final Map<String, List<Result>> raceResults = new ConcurrentHashMap<>();
+    private final Map<String, Schedule> schedule = new ConcurrentHashMap<>();
     private final Map<String, ScoreBoard> scoreBoards = new ConcurrentHashMap<>();
     private final DataManager dataManager;
     final static Logger logger = Logger.getLogger(ScoreBoardManager.class);
@@ -35,17 +37,21 @@ public class ScoreBoardManager {
             logger.error(e);
             rowLimit = 5;
         }
-        return getScores(raceId, rowLimit, null);
+        return getScores(raceId, rowLimit, null, 2);
     }
-    public String getScores(String raceId, int rowLimit, String type) {
+    public String getScores(String raceId, int rowLimit, String type, int timePrecision) {
         String rslt;
         scoreBoards.putIfAbsent(raceId, new ScoreBoard(raceId, raceId, this));
-        rslt = scoreBoards.get(raceId).getScores(rowLimit, type);
+        rslt = scoreBoards.get(raceId).getScores(rowLimit, type, timePrecision);
         return rslt;
     }
 
     public Participant getParticipant(int id) {
         return participants.get(id);
+    }
+
+    public Schedule getSchedule(String raceId) {
+        return schedule.get(raceId);
     }
 
     public List<Result> getResultsList(String raceId) {
@@ -55,6 +61,9 @@ public class ScoreBoardManager {
 
     public void addParticipant(Participant participant) {
         participants.putIfAbsent(participant.getId(), participant);
+    }
+    public void addSchedule(Schedule scheduleItem) {
+        schedule.putIfAbsent(scheduleItem.getRaceId(), scheduleItem);
     }
 
     public void addResult(Result newResult) {

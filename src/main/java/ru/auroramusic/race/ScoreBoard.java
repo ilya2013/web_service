@@ -16,7 +16,7 @@ public class ScoreBoard {
     private final String separator = ",";
     public static final String  START_ORDER = "START";
     public static final String  FINISH_ORDER = "FINISH";
-    
+    public final String  disId;
     private final Comparator<ResultRecord> startOrderComparator = Comparator.comparingInt(o -> o.getResult().getStartOrder());
     private final Comparator<ResultRecord> rnkOrderComparator = Comparator.comparingInt(o -> o.getResult().getRnkOrder());
 
@@ -24,6 +24,7 @@ public class ScoreBoard {
         this.name = name;
         this.scoreBoardManager = scoreBoardManager;
         this.raceId = raceId;
+        this.disId = scoreBoardManager.getSchedule(raceId).getDisId();
         init();
     }
 
@@ -45,7 +46,7 @@ public class ScoreBoard {
                         + scoreBoardManager.getParticipant(resultRecord.getResult().getId())));
     }
 
-    public String getScores(int rowLimit, String type) {
+    public String getScores(int rowLimit, String type, int timePrecision) {
         int localRowLimit = rowLimit < 0 || rowLimit > 100 ? this.DEFAULT_ROW_LIMIT : rowLimit;
         Comparator<ResultRecord> comparator = null;
         if (type == null) {
@@ -55,15 +56,15 @@ public class ScoreBoard {
         } else if (FINISH_ORDER.equals(type.toUpperCase())){
             comparator = rnkOrderComparator;
         }
-        return toCSV(localRowLimit, comparator);
+        return toCSV(localRowLimit, comparator, timePrecision);
     }
 
 
     public String getScores(int rowLimit) {
-     return getScores(rowLimit, null);
+     return getScores(rowLimit, null, 2);
     }
     
-    private String toCSV(int rowLimit, Comparator<ResultRecord> comparator) {
+    private String toCSV(int rowLimit, Comparator<ResultRecord> comparator, int timePrecision) {
         int rowNumber = 0;
         StringBuilder sb = new StringBuilder();
         List<ResultRecord> sortedResults;
@@ -101,9 +102,9 @@ public class ScoreBoard {
                         .append(resultRecord.getResult().getStartOrder()).append(separator)
                         .append(resultRecord.getResult().getDtFinish()).append(separator)
                         .append(resultRecord.getResult().getTotalBehind()).append(separator)
-                        .append(msToTime(resultRecord.getResult().getRunTime())).append(separator)
+                        .append(msToTime(resultRecord.getResult().getRunTime(), timePrecision)).append(separator)
                         .append(resultRecord.getResult().getRnkOrder()).append(separator)
-                        .append(msToTime(resultRecord.getResult().getTotalTime()));
+                        .append(msToTime(resultRecord.getResult().getTotalTime(), timePrecision));
                 rowNumber++;
                 if ((rowNumber % rowLimit) == 0 || rowNumber == resultRecords.size()) {
                     sb.append(System.lineSeparator());
@@ -115,7 +116,7 @@ public class ScoreBoard {
         return sb.toString();
     }
 
-    public String  msToTime(int mls) {
+    public String  msToTime(int mls, int precision) {
         StringBuilder sb = new StringBuilder();
         String timeSeparator = ":";
         int milliseconds = (int) (mls % 1000);
@@ -125,7 +126,10 @@ public class ScoreBoard {
         sb.append(hours < 10 ? "0" + hours : hours ).append(timeSeparator)
                 .append(minutes < 10 ? "0" + minutes : minutes).append(timeSeparator)
                 .append(seconds < 10 ? "0" + seconds : seconds).append(".")
-                .append(milliseconds < 10 ? "00" + milliseconds : milliseconds < 100 ? "0" + milliseconds : String.valueOf(milliseconds));
+                .append((milliseconds < 10 ? "00" + milliseconds
+                        : milliseconds < 100 ? "0" + milliseconds
+                                             : String.valueOf(milliseconds)
+                        ).substring(0, precision));
         return sb.toString();
     }
 

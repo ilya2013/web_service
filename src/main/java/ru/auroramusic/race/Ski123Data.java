@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import ru.auroramusic.race.data.Participant;
 import ru.auroramusic.race.data.Result;
+import ru.auroramusic.race.data.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ public class Ski123Data {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JsonProperty("Results")
     private List<Result> results = new ArrayList<>();
+    @JsonProperty("Schedule")
+    private List<Schedule> schedule = new ArrayList<>();
 
 
     public List<Participant> getParticipants() {
@@ -28,6 +31,9 @@ public class Ski123Data {
 
     public List<Result> getResults() {
         return results;
+    }
+    public List<Schedule> getSchedule() {
+        return schedule;
     }
 
     public void setResults(List<Result> results) {

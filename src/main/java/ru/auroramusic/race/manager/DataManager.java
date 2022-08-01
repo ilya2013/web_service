@@ -35,6 +35,7 @@ public class DataManager implements Runnable {
                 Ski123Data value = xmlMapper.readValue(xml, Ski123Data.class);
                 value.getResults().forEach(scoreBoardManager::addResult);
                 value.getParticipants().forEach(scoreBoardManager::addParticipant);
+                value.getSchedule().forEach(scoreBoardManager::addSchedule);
                 Thread.sleep(500L);
             } catch (IOException | InterruptedException e) {
                 logger.error(e);
